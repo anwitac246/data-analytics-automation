@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Zap, TrendingUp, BarChart3, PieChart, LineChart, Sparkles, CheckCircle, Star, ArrowRight, Play, Target, Award, Trophy, Gift, Database, Brain, Rocket, Shield } from 'lucide-react';
 import OrbitingCubeGame from './threed';
+import Navbar from './navbar';
 
 const HomePage = () => {
   const [dragActive, setDragActive] = useState(false);
@@ -208,7 +209,7 @@ const pollJobStatus = async (jobId) => {
   setAnalysisProgress(0);
   
   let attempts = 0;
-  const maxAttempts = 150; // 5 minutes with 2-second intervals
+  const maxAttempts = 150; 
   
   const poll = async () => {
     try {
@@ -225,47 +226,43 @@ const pollJobStatus = async (jobId) => {
       
       const data = await response.json();
       console.log(`Job status:`, data);
-      
-      // Update progress (ensure it's a number)
+
       const progress = Math.min(Math.max(data.progress || 0, 0), 100);
       setAnalysisProgress(progress);
-      
-      // Handle different job statuses
+
       if (data.status === 'completed') {
         console.log('Job completed successfully');
         setIsAnalyzing(false);
         gainExperience(300);
         
-        // Fixed: Use job_id parameter name to match results page
         window.location.href = `/results?job_id=${jobId}`;
         return;
         
       } else if (data.status === 'failed') {
         console.error('Job failed:', data.error);
         setIsAnalyzing(false);
-        
-        // Show more detailed error message
+ 
         const errorMsg = data.error || 'Unknown error occurred during analysis';
         alert(`Analysis failed: ${errorMsg}\n\nPlease try uploading your file again.`);
         return;
         
       } else if (data.status === 'processing') {
         console.log(`Job processing... Progress: ${progress}%`);
-        // Continue polling
+
         
       } else if (data.status === 'queued') {
         console.log('Job queued, waiting to start...');
-        // Continue polling
+ 
         
       } else {
         console.warn('Unknown status:', data.status);
-        // Continue polling for unknown status
+      
       }
       
-      // Continue polling if job is not finished
+
       attempts++;
       if (attempts < maxAttempts) {
-        setTimeout(poll, 2000); // Poll every 2 seconds
+        setTimeout(poll, 2000);
       } else {
         console.error('Polling timed out after', maxAttempts, 'attempts');
         setIsAnalyzing(false);
@@ -278,7 +275,7 @@ const pollJobStatus = async (jobId) => {
       
       if (attempts < maxAttempts) {
         console.log(`Retrying in 3 seconds... (attempt ${attempts}/${maxAttempts})`);
-        setTimeout(poll, 3000); // Wait longer on error
+        setTimeout(poll, 3000);
       } else {
         setIsAnalyzing(false);
         alert(`Error checking analysis status: ${err.message}\n\nPlease try uploading your file again.`);
@@ -286,7 +283,7 @@ const pollJobStatus = async (jobId) => {
     }
   };
   
-  // Start polling immediately
+
   poll();
 };
 
@@ -333,7 +330,7 @@ const pollJobStatus = async (jobId) => {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
-
+      <Navbar/>
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" />
 
 
@@ -345,7 +342,7 @@ const pollJobStatus = async (jobId) => {
           style={{ transform: `scaleX(${typeof window !== 'undefined' && document ? scrollY / (document.documentElement.scrollHeight - window.innerHeight) : 0})` }} />
       </div>
 
-      <div className="fixed top-6 right-6 z-40">
+      <div className="fixed top-6 right-6 z-40 my-20">
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-sm font-bold">
@@ -372,7 +369,7 @@ const pollJobStatus = async (jobId) => {
         </div>
       )}
 
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 py-30">
         <div className="max-w-7xl mx-auto text-center relative z-10">
 
           <div className="mb-12 relative">
