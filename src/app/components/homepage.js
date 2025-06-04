@@ -124,64 +124,67 @@ const HomePage = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+  const processFile = async (file) => {
+  try {
+    setUploadedFile(file);
+    gainExperience(150);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
 
+    const jobId = await uploadFileToBackend(file);
+    await pollJobStatus(jobId); 
+  } catch (err) {
+    console.error('File processing error:', err);
+    setIsAnalyzing(false);
+    alert(`Upload failed: ${err.message}. Please try again.`);
+  }
+};
   const handleDrop = async (e) => {
-    e.preventDefault();
-    setDragActive(false);
-    const files = e.dataTransfer.files;
-    if (files[0]) {
-      setUploadedFile(files[0]);
-      gainExperience(150);
-      setIsAnalyzing(true);
-      setAnalysisProgress(0);
+  e.preventDefault();
+  setDragActive(false);
+  const files = e.dataTransfer.files;
+  if (files[0]) {
+    await processFile(files[0]);
+  }
+};
 
-      try {
-        const jobId = await uploadFileToBackend(files[0]);
-        await pollJobStatus(jobId);
-      } catch (err) {
-        setIsAnalyzing(false);
-        alert('Upload failed. Please try again.');
-      }
-    }
-  };
-
-  const handleFileSelect = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploadedFile(file);
-      gainExperience(150);
-      setIsAnalyzing(true);
-      setAnalysisProgress(0);
-
-      try {
-        const jobId = await uploadFileToBackend(file);
-        await pollJobStatus(jobId);
-      } catch (err) {
-        setIsAnalyzing(false);
-        alert('Upload failed. Please try again.');
-      }
-    }
-  };
+const handleFileSelect = async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    await processFile(file);
+  }
+};
 
   const uploadFileToBackend = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
+  const formData = new FormData();
+  formData.append('file', file);
 
-    try {
-      const res = await fetch('http://localhost:5000/run-analysis', {
-        method: 'POST',
-        body: formData,
-      });
+  try {
+    console.log('Uploading file:', file.name);
+    
+    const res = await fetch('http://localhost:5000/run-analysis', {
+      method: 'POST',
+      body: formData,
+    });
 
-      if (!res.ok) throw new Error('Upload failed');
-
-      const data = await res.json();
-      return data.job_id;
-    } catch (err) {
-      console.error(err);
-      throw err;
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Upload failed: ${res.status} ${res.statusText} - ${errorText}`);
     }
-  };
+
+    const data = await res.json();
+    console.log('Upload response:', data);
+    
+    if (!data.job_id) {
+      throw new Error('No job ID returned from server');
+    }
+    
+    return data.job_id;
+  } catch (err) {
+    console.error('Upload error:', err);
+    throw err;
+  }
+};
 
   const startAnalysis = () => {
     setIsAnalyzing(true);
@@ -198,45 +201,96 @@ const HomePage = () => {
       });
     }, 200);
   };
-  const pollJobStatus = async (jobId) => {
-    const maxAttempts = 60; // 5 minutes max
-    let attempts = 0;
-
-    const poll = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/job-status/${jobId}`);
-        const data = await res.json();
-
-        setAnalysisProgress(data.progress || 0);
-
-        if (data.status === 'completed') {
-          setIsAnalyzing(false);
-          gainExperience(300);
-          // Redirect to results page
-          window.location.href = `/results/${jobId}`;
-          return;
-        } else if (data.status === 'failed') {
-          setIsAnalyzing(false);
-          alert('Analysis failed: ' + data.error);
-          return;
+ 
+const pollJobStatus = async (jobId) => {
+  console.log(`Starting to poll job status for: ${jobId}`);
+  setIsAnalyzing(true);
+  setAnalysisProgress(0);
+  
+  let attempts = 0;
+  const maxAttempts = 150; // 5 minutes with 2-second intervals
+  
+  const poll = async () => {
+    try {
+      console.log(`Polling attempt ${attempts + 1}/${maxAttempts} for job ${jobId}`);
+      
+      const response = await fetch(`http://localhost:5000/job-status/${jobId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Job not found. Please try uploading the file again.');
         }
-
-        attempts++;
-        if (attempts < maxAttempts) {
-          setTimeout(poll, 2000); // Poll every 2 seconds
-        } else {
-          setIsAnalyzing(false);
-          alert('Analysis timed out. Please try again.');
-        }
-      } catch (err) {
-        console.error('Polling error:', err);
-        setIsAnalyzing(false);
-        alert('Error checking analysis status');
+        throw new Error(`Server error: ${response.status}`);
       }
-    };
-
-    poll();
+      
+      const data = await response.json();
+      console.log(`Job status:`, data);
+      
+      // Update progress (ensure it's a number)
+      const progress = Math.min(Math.max(data.progress || 0, 0), 100);
+      setAnalysisProgress(progress);
+      
+      // Handle different job statuses
+      if (data.status === 'completed') {
+        console.log('Job completed successfully');
+        setIsAnalyzing(false);
+        gainExperience(300);
+        
+        // Fixed: Use job_id parameter name to match results page
+        window.location.href = `/results?job_id=${jobId}`;
+        return;
+        
+      } else if (data.status === 'failed') {
+        console.error('Job failed:', data.error);
+        setIsAnalyzing(false);
+        
+        // Show more detailed error message
+        const errorMsg = data.error || 'Unknown error occurred during analysis';
+        alert(`Analysis failed: ${errorMsg}\n\nPlease try uploading your file again.`);
+        return;
+        
+      } else if (data.status === 'processing') {
+        console.log(`Job processing... Progress: ${progress}%`);
+        // Continue polling
+        
+      } else if (data.status === 'queued') {
+        console.log('Job queued, waiting to start...');
+        // Continue polling
+        
+      } else {
+        console.warn('Unknown status:', data.status);
+        // Continue polling for unknown status
+      }
+      
+      // Continue polling if job is not finished
+      attempts++;
+      if (attempts < maxAttempts) {
+        setTimeout(poll, 2000); // Poll every 2 seconds
+      } else {
+        console.error('Polling timed out after', maxAttempts, 'attempts');
+        setIsAnalyzing(false);
+        alert('Analysis timed out. This might mean your file is very large or there was a server issue. Please try again with a smaller file or contact support.');
+      }
+      
+    } catch (err) {
+      console.error('Polling error:', err);
+      attempts++;
+      
+      if (attempts < maxAttempts) {
+        console.log(`Retrying in 3 seconds... (attempt ${attempts}/${maxAttempts})`);
+        setTimeout(poll, 3000); // Wait longer on error
+      } else {
+        setIsAnalyzing(false);
+        alert(`Error checking analysis status: ${err.message}\n\nPlease try uploading your file again.`);
+      }
+    }
   };
+  
+  // Start polling immediately
+  poll();
+};
+
+
   const gainExperience = (exp) => {
     const newExp = experience + exp;
     const newLevel = Math.floor(newExp / 500) + 1;
