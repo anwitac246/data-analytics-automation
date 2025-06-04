@@ -15,14 +15,13 @@ CORS(app)
 app.config['UPLOAD_FOLDER'] = "uploads"
 app.config['OUTPUT_FOLDER'] = "outputs"
 app.config['STATIC_FOLDER'] = "static"
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  
 
-# Create directories if they don't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
 
-# Global job tracker with thread safety
+
 jobs = {}
 jobs_lock = threading.Lock()
 
@@ -44,10 +43,10 @@ def process_file_async(job_id, filepath, filename):
     try:
         print(f"Starting processing for job {job_id}")
         
-        # Update job status to processing
+    
         update_job_status(job_id, status="processing", progress=10)
         
-        # Define output paths with absolute paths
+    
         output_notebook = os.path.abspath(os.path.join(app.config['OUTPUT_FOLDER'], f"{job_id}_output.ipynb"))
         output_image = os.path.abspath(os.path.join(app.config['STATIC_FOLDER'], f'{job_id}_histogram.png'))
         summary_file = os.path.abspath(os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_summary.json'))
@@ -56,23 +55,19 @@ def process_file_async(job_id, filepath, filename):
         print(f"  - Notebook: {output_notebook}")
         print(f"  - Image: {output_image}")
         print(f"  - Summary: {summary_file}")
-        
-        # Check if input file exists
+    
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"Input file not found: {filepath}")
-        
-        # Check if notebook exists
+  
         notebook_path = 'notebooks/preprocessing.ipynb'
         if not os.path.exists(notebook_path):
             raise FileNotFoundError(f"Notebook not found: {notebook_path}")
-        
-        # Update progress
+
         update_job_status(job_id, progress=30)
         
         print(f"Executing notebook for job {job_id}")
         print(f"Input file size: {os.path.getsize(filepath)} bytes")
-        
-        # Execute notebook with papermill
+
         pm.execute_notebook(
             notebook_path,
             output_notebook,
@@ -86,16 +81,15 @@ def process_file_async(job_id, filepath, filename):
         
         print(f"Notebook executed for job {job_id}")
         
-        # Update progress
+
         update_job_status(job_id, progress=80)
         
-        # Check what files were actually created
+    
         print(f"Checking output files:")
         print(f"  - Summary file exists: {os.path.exists(summary_file)}")
         print(f"  - Image file exists: {os.path.exists(output_image)}")
         print(f"  - Output notebook exists: {os.path.exists(output_notebook)}")
         
-        # List all files in output directories for debugging
         print(f"Files in {app.config['OUTPUT_FOLDER']}:")
         for f in os.listdir(app.config['OUTPUT_FOLDER']):
             print(f"  - {f}")
@@ -104,7 +98,6 @@ def process_file_async(job_id, filepath, filename):
         for f in os.listdir(app.config['STATIC_FOLDER']):
             print(f"  - {f}")
         
-        # Verify outputs were created
         if os.path.exists(summary_file):
             print(f"Job {job_id} completed successfully")
             update_job_status(
@@ -141,26 +134,21 @@ def run_analysis():
         if file.filename == '':
             return jsonify({"error": "No file selected"}), 400
 
-        # Validate file type
         allowed_extensions = {'csv', 'xlsx', 'xls', 'json'}
         if not ('.' in file.filename and 
                 file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
             return jsonify({"error": "Invalid file type. Allowed: CSV, Excel, JSON"}), 400
 
-        # Generate unique job ID
         job_id = str(uuid.uuid4())
         
-        # Secure filename
         original_filename = file.filename
         secure_name = secure_filename(file.filename)
         filename = f"{job_id}_{secure_name}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
-        # Save uploaded file
         file.save(filepath)
         print(f"File saved: {filepath}")
         
-        # Initialize job status
         with jobs_lock:
             jobs[job_id] = {
                 "status": "queued",
@@ -170,7 +158,6 @@ def run_analysis():
                 "filepath": filepath
             }
         
-        # Start async processing
         thread = threading.Thread(target=process_file_async, args=(job_id, filepath, original_filename))
         thread.daemon = True
         thread.start()
@@ -197,7 +184,7 @@ def get_job_status(job_id):
             
             job_data = jobs[job_id].copy()
         
-        # Remove sensitive information
+ 
         job_data.pop('filepath', None)
         
         return jsonify(job_data)
@@ -206,7 +193,7 @@ def get_job_status(job_id):
         print(f"Error getting job status: {str(e)}")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-@app.route('/results')
+@app.route('/results/<job_id>')
 def results(job_id):
     """Serve results page for a specific job"""
     try:
@@ -223,25 +210,21 @@ def results(job_id):
                 "progress": job_data.get("progress", 0)
             }), 400
         
-        # Build the correct file paths with job_id
         summary_path = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_summary.json')
         image_path = os.path.join(app.config['STATIC_FOLDER'], f'{job_id}_histogram.png')
         
         print(f"Looking for summary at: {summary_path}")
         print(f"Looking for image at: {image_path}")
         
-        # Check if files exist
         if not os.path.exists(summary_path):
             return jsonify({"error": f"Summary file not found at {summary_path}"}), 404
             
         if not os.path.exists(image_path):
             return jsonify({"error": f"Image file not found at {image_path}"}), 404
 
-        # Load summary data
         with open(summary_path, 'r') as f:
             summary = json.load(f)
 
-        # Return JSON response with correct image URL
         return jsonify({
             "job_id": job_id,
             "filename": job_data["filename"],
@@ -281,7 +264,7 @@ def health_check():
 def list_jobs():
     """List all jobs (for debugging)"""
     with jobs_lock:
-        # Remove sensitive info
+       
         safe_jobs = {}
         for job_id, job_data in jobs.items():
             safe_job = job_data.copy()
@@ -304,7 +287,6 @@ if __name__ == '__main__':
     print(f"Output folder: {app.config['OUTPUT_FOLDER']}")
     print(f"Static folder: {app.config['STATIC_FOLDER']}")
     
-    # Check if notebook exists
     if not os.path.exists('notebooks/preprocessing.ipynb'):
         print("WARNING: notebooks/preprocessing.ipynb not found!")
     

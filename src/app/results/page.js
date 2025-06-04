@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "../components/navbar";
 
 export default function ResultsPage() {
   const [summary, setSummary] = useState(null);
@@ -42,34 +43,37 @@ export default function ResultsPage() {
   };
 
   const formatSummaryData = (data) => {
-    if (!data) return [];
-    
-    const entries = [];
-    Object.entries(data).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          entries.push({
-            category: key,
-            metric: subKey,
-            value: typeof subValue === 'number' ? 
-              (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4)) : 
-              subValue
-          });
-        });
-      } else {
-        entries.push({
-          category: 'General',
-          metric: key,
-          value: typeof value === 'number' ? 
-            (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4)) : 
-            value
-        });
-      }
-    });
-    
-    return entries;
-  };
+  if (!data) return [];
 
+  const entries = [];
+  Object.entries(data).forEach(([key, value]) => {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.entries(value).forEach(([subKey, subValue]) => {
+        entries.push({
+          category: key,
+          metric: subKey,
+          value: (typeof subValue === 'object' && subValue !== null)
+            ? JSON.stringify(subValue)
+            : (typeof subValue === 'number'
+                ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
+                : subValue)
+        });
+      });
+    } else {
+      entries.push({
+        category: 'General',
+        metric: key,
+        value: (typeof value === 'object' && value !== null)
+          ? JSON.stringify(value)
+          : (typeof value === 'number'
+              ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
+              : value)
+      });
+    }
+  });
+
+  return entries;
+};
   const summaryEntries = formatSummaryData(summary);
   const groupedEntries = summaryEntries.reduce((acc, entry) => {
     if (!acc[entry.category]) acc[entry.category] = [];
@@ -79,13 +83,13 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white">
-
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <Navbar/>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto">
+      <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto my-20">
 
         <motion.div
           initial={{ opacity: 0, y: -30 }}
