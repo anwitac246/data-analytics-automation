@@ -23,108 +23,144 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const particles = [];
-    const connections = [];
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
-        this.opacity = Math.random() * 0.6 + 0.2;
-        this.size = Math.random() * 2 + 1;
-        this.hue = Math.random() * 60 + 240;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-
-        const dx = mousePosition.x - this.x;
-        const dy = mousePosition.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 100) {
-          const force = (100 - distance) / 100;
-          this.vx += (dx / distance) * force * 0.01;
-          this.vy += (dy / distance) * force * 0.01;
-        }
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
-        gradient.addColorStop(0, `hsla(${this.hue}, 70%, 60%, ${this.opacity})`);
-        gradient.addColorStop(1, `hsla(${this.hue}, 70%, 60%, 0)`);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < 80; i++) {
-      particles.push(new Particle());
-    }
-
-    const animate = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((particle, i) => {
-        particle.update();
-        particle.draw();
-
-        particles.slice(i + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 120) {
-            const opacity = (120 - distance) / 120 * 0.1;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(147, 51, 234, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, [mousePosition]);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+useEffect(() => {
+    const handleScroll = throttle(() => {
+      setScrollY(window.scrollY);
+    }, 100); 
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const throttle = (func, limit) => {
+    let lastFunc;
+    let lastRan;
+    return function (...args) {
+      if (!lastRan) {
+        func.apply(this, args);
+        lastRan = Date.now();
+      } else {
+        clearTimeout(lastFunc);
+        lastFunc = setTimeout(() => {
+          if (Date.now() - lastRan >= limit) {
+            func.apply(this, args);
+            lastRan = Date.now();
+          }
+        }, limit - (Date.now() - lastRan));
+      }
+    };
+  };
+
+  useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  let animationFrameId;
+
+  const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.5; 
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.opacity = Math.random() * 0.4 + 0.2;
+      this.size = Math.random() * 1.5 + 1; 
+      this.hue = Math.random() * 60 + 240;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+      const dx = mousePosition.x - this.x;
+      const dy = mousePosition.y - this.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < 80) { 
+        const force = (80 - distance) / 80;
+        this.vx += (dx / distance) * force * 0.005; 
+        this.vy += (dy / distance) * force * 0.005;
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; 
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 40; i++) {
+    particles.push(new Particle());
+  }
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        const animate = () => {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          particles.forEach((particle, i) => {
+            particle.update();
+            particle.draw();
+
+            particles.slice(i + 1).forEach(otherParticle => {
+              const dx = particle.x - otherParticle.x;
+              const dy = particle.y - otherParticle.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              if (distance < 100) {
+                const opacity = (100 - distance) / 100 * 0.08;
+                ctx.beginPath();
+                ctx.moveTo(particle.x, particle.y);
+                ctx.lineTo(otherParticle.x, otherParticle.y);
+                ctx.strokeStyle = `rgba(147, 51, 234, ${opacity})`;
+                ctx.lineWidth = 0.4;
+                ctx.stroke();
+              }
+            });
+          });
+
+          animationFrameId = requestAnimationFrame(animate);
+        };
+        animate();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    },
+    { threshold: 0.1 }
+  );
+
+  observer.observe(canvas);
+
+  return () => {
+    cancelAnimationFrame(animationFrameId);
+    window.removeEventListener('resize', resizeCanvas);
+    observer.disconnect();
+  };
+}, [mousePosition]);
+
+  useEffect(() => {
+  const handleMouseMove = throttle((e) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, 100);
+  window.addEventListener('mousemove', handleMouseMove);
+  return () => window.removeEventListener('mousemove', handleMouseMove);
+}, []);
   const processFile = async (file) => {
   try {
     setUploadedFile(file);
