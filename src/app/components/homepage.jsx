@@ -25,11 +25,6 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-=======
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
 useEffect(() => {
     const handleScroll = throttle(() => {
       setScrollY(window.scrollY);
@@ -38,10 +33,6 @@ useEffect(() => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-<<<<<<< HEAD:src/app/components/homepage.jsx
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
   const throttle = (func, limit) => {
     let lastFunc;
     let lastRan;
@@ -81,23 +72,10 @@ useEffect(() => {
     constructor() {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-      this.vx = (Math.random() - 0.5) * 0.5; // Reduced speed
-      this.vy = (Math.random() - 0.5) * 0.5;
-      this.opacity = Math.random() * 0.4 + 0.2;
-      this.size = Math.random() * 1.5 + 1; // Smaller particles
-=======
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
       this.vx = (Math.random() - 0.5) * 0.5; 
       this.vy = (Math.random() - 0.5) * 0.5;
       this.opacity = Math.random() * 0.4 + 0.2;
       this.size = Math.random() * 1.5 + 1; 
-<<<<<<< HEAD:src/app/components/homepage.jsx
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
       this.hue = Math.random() * 60 + 240;
     }
 
@@ -112,21 +90,9 @@ useEffect(() => {
       const dy = mousePosition.y - this.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-      if (distance < 80) { // Reduced interaction distance
-        const force = (80 - distance) / 80;
-        this.vx += (dx / distance) * force * 0.005; // Reduced force
-=======
       if (distance < 80) { 
         const force = (80 - distance) / 80;
         this.vx += (dx / distance) * force * 0.005; 
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
-      if (distance < 80) { 
-        const force = (80 - distance) / 80;
-        this.vx += (dx / distance) * force * 0.005; 
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
         this.vy += (dy / distance) * force * 0.005;
       }
     }
@@ -134,28 +100,12 @@ useEffect(() => {
     draw() {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-      ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; // Simplified fill
-=======
       ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; 
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
-      ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; 
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
       ctx.fill();
     }
   }
 
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-  for (let i = 0; i < 40; i++) { // Reduced particle count
-=======
   for (let i = 0; i < 40; i++) {
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
-  for (let i = 0; i < 40; i++) {
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
     particles.push(new Particle());
   }
 
@@ -175,15 +125,7 @@ useEffect(() => {
               const dy = particle.y - otherParticle.y;
               const distance = Math.sqrt(dx * dx + dy * dy);
 
-<<<<<<< HEAD:src/app/components/homepage.jsx
-<<<<<<< HEAD:src/app/components/homepage.jsx
-              if (distance < 100) { // Reduced connection distance
-=======
               if (distance < 100) {
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
-=======
-              if (distance < 100) {
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
                 const opacity = (100 - distance) / 100 * 0.08;
                 ctx.beginPath();
                 ctx.moveTo(particle.x, particle.y);

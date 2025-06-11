@@ -1,18 +1,8 @@
-<<<<<<< HEAD
-'use client';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-=======
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/navbar";
-<<<<<<< HEAD
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
 export default function ResultsPage() {
   const [results, setResults] = useState(null);
@@ -53,48 +43,8 @@ export default function ResultsPage() {
   };
 
   const formatSummaryData = (data) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (!data) return [];
-
-    const entries = [];
-    Object.entries(data).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          entries.push({
-            category: key,
-            metric: subKey,
-            value: (typeof subValue === 'object' && subValue !== null)
-              ? JSON.stringify(subValue)
-              : (typeof subValue === 'number'
-                ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
-                : subValue)
-          });
-        });
-      } else {
-        entries.push({
-          category: 'General',
-          metric: key,
-          value: (typeof value === 'object' && value !== null)
-            ? JSON.stringify(value)
-            : (typeof value === 'number'
-              ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
-              : value)
-        });
-      }
-    });
-
-    return entries;
-  };
-
-  const summaryEntries = formatSummaryData(results?.summary);
-=======
   if (!data) return [];
 
-=======
-  if (!data) return [];
-
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
   const entries = [];
   Object.entries(data).forEach(([key, value]) => {
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
@@ -124,8 +74,7 @@ export default function ResultsPage() {
 
   return entries;
 };
-  const summaryEntries = formatSummaryData(summary);
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+  const summaryEntries = formatSummaryData(results?.summary);
   const groupedEntries = summaryEntries.reduce((acc, entry) => {
     if (!acc[entry.category]) acc[entry.category] = [];
     acc[entry.category].push(entry);
@@ -134,30 +83,14 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white">
-<<<<<<< HEAD
-<<<<<<< HEAD
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-=======
       <Navbar/>
       <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
-      <Navbar/>
-      <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-      <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto">
-=======
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
       <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto my-20">
 
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
