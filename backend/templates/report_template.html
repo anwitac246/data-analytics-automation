@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis Report - Job {{ job_id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            font-size: 12pt;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+        .container {
+            max-width: 8.27in; /* A4 width */
+            margin: 0 auto;
+            padding: 1in;
+        }
+        .title-page {
+            text-align: center;
+            padding-top: 2in;
+            page-break-after: always;
+        }
+        .title {
+            font-size: 28pt;
+            font-weight: 700;
+            margin-bottom: 0.5in;
+        }
+        .subtitle {
+            font-size: 16pt;
+            margin-bottom: 0.3in;
+        }
+        .normal-text {
+            font-size: 12pt;
+            margin-bottom: 0.5in;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5in;
+            margin-bottom: 0.5in;
+        }
+        .logo {
+            width: 2in;
+            height: 2in;
+            background: linear-gradient(to right, #9333ea, #2563eb);
+            border-radius: 0.25in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .company-name {
+            font-size: 20pt;
+            font-weight: 700;
+            background: linear-gradient(to right, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            margin-top: 0.5in;
+            margin-bottom: 0.25in;
+            color: #1e3a8a;
+        }
+        h2 {
+            font-size: 14pt;
+            font-weight: 700;
+            margin-top: 0.4in;
+            margin-bottom: 0.2in;
+        }
+        p, ul {
+            margin-bottom: 0.2in;
+            line-height: 1.5;
+        }
+        ul {
+            list-style: disc;
+            padding-left: 0.5in;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.5in;
+            font-size: 10pt;
+        }
+        th, td {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 0.1in;
+            text-align: left;
+        }
+        th {
+            font-weight: 700;
+        }
+        .table-header {
+            border-top: 2px solid #000;
+        }
+        .table-footer {
+            border-bottom: 2px solid #000;
+        }
+        .no-border {
+            border: none;
+        }
+        img {
+            max-width: 60%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5in;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0.5in;
+            width: 8.27in;
+            text-align: center;
+            font-size: 10pt;
+            color: #4b5563;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.1in;
+        }
+        .download-button {
+            display: block;
+            margin: 0.5in auto;
+            padding: 0.2in 0.5in;
+            background: linear-gradient(to right, #9333ea, #2563eb);
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0.1in;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+        .download-button:hover {
+            transform: scale(1.05);
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                padding: 0;
+                margin: 0;
+                width: 8.27in;
+            }
+            .download-button {
+                padding-top: 0;
+            }
+            .footer {
+                display: block;
+            }
+            @page {
+                margin: 1in;
+                size: A4 portrait;
+            }
+            table, img {
+                page-break-inside: avoid;
+            }
+            h1 {
+                page-break-before: auto;
+            }
+            section {
+                page-break-after: auto;
+            }
+        }
+        a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-page">
+            <div class="logo-container">
+                <div class="logo">
+                    <svg class="w-1.5in h-1.5in text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 12h2v5H7v-5zm4-6h2v11h-2V6zm4 3h2v8h-2V9z" />
+                    </svg>
+                </div>
+                <span class="company-name">AnalyticsHub</span>
+            </div>
+            <div class="title">Data Analysis Report</div>
+            <div class="subtitle">Dataset: {{ dataset_name }}</div>
+            <div class="subtitle">Job ID: {{ job_id }}</div>
+            <div class="subtitle">Generated on: {{ processed_at }}</div>
+            <div class="normal-text">Powered by AI-Driven Analytics</div>
+            <img src="{{ image_url }}" alt="Data Visualization">
+        </div>
+
+        <section id="executive-summary">
+            <h1>Executive Summary</h1>
+            <p>{{ insights_summary }}</p>
+        </section>
+
+        <section id="dataset-overview">
+            <h1>Dataset Overview</h1>
+            <ul>
+                <li><strong>Rows:</strong> {{ rows }}</li>
+                <li><strong>Columns:</strong> {{ columns }}</li>
+                <li><strong>Numeric Columns:</strong> {{ numeric_columns|join(', ') if numeric_columns else 'None' }}</li>
+                <li><strong>Categorical Columns:</strong> {{ categorical_columns|join(', ') if categorical_columns else 'None' }}</li>
+            </ul>
+
+            <h2>Missing Values</h2>
+            {% if missing_values %}
+            <table>
+                <thead>
+                    <tr class="table-header">
+                        <th>Column</th>
+                        <th>Missing Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in missing_values %}
+                    <tr>
+                        <td>{{ item.column }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td colspan="2" class="no-border"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <p>No missing values found.</p>
+            {% endif %}
+        </section>
+
+        <section id="key-insights">
+            <h1>Key Insights</h1>
+            <ul>
+                <li><strong>Key Columns:</strong> {{ key_columns|join(', ') if key_columns else 'None' }}</li>
+                <li><strong>Correlation Insights:</strong>
+                    {% if correlation_insights %}
+                    <ul>
+                        {% for insight in correlation_insights %}
+                        <li>{{ insight }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No correlation insights available.</p>
+                    {% endif %}
+                </li>
+            </ul>
+        </section>
+
+        <section id="statistical-analysis">
+            <h1>Statistical Analysis</h1>
+            <h2>Descriptive Statistics</h2>
+            {% if stats_columns %}
+            <table>
+                <thead>
+                    <tr class="table-header">
+                        <th>Statistic</th>
+                        {% for col in stats_columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in stats_rows %}
+                    <tr>
+                        <td>{{ row.stat }}</td>
+                        {% for value in row.stat_values %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td colspan="{{ stats_columns|length + 1 }}" class="no-border"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <p>No statistical summary available.</p>
+            {% endif %}
+
+            <h2>Feature Importance</h2>
+            {% if feature_importance %}
+            <table>
+                <thead>
+                    <tr class="table-header">
+                        <th>Column</th>
+                        <th>Importance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in feature_importance %}
+                    <tr>
+                        <td>{{ item.column }}</td>
+                        <td>{{ item.importance }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td colspan="2" class="no-border"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <p>No feature importance data available.</p>
+            {% endif %}
+
+            <h2>Correlation Matrix</h2>
+            {% if corr_columns %}
+            <table>
+                <thead>
+                    <tr class="table-header">
+                        <th>Column</th>
+                        {% for col in corr_columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in corr_rows %}
+                    <tr>
+                        <td>{{ row.column }}</td>
+                        {% for value in row.corr_values %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td colspan="{{ corr_columns|length + 1 }}" class="no-border"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <p>No correlation matrix available.</p>
+            {% endif %}
+        </section>
+
+        <section id="visualization">
+            <h1>Visualization</h1>
+            <img src="{{ image_url }}" alt="Data Analysis Visualization">
+        </section>
+
+        <section id="recommendations">
+            <h1>Recommendations</h1>
+            {% if recommendations %}
+            <ul>
+                {% for rec in recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No recommendations available.</p>
+            {% endif %}
+        </section>
+
+        <section id="conclusion">
+            <h1>Conclusion</h1>
+            <p>This report provides a comprehensive analysis of the dataset, highlighting key columns, significant correlations, and actionable recommendations. By focusing on the identified columns and implementing the suggested actions, stakeholders can make informed decisions to drive business value.</p>
+        </section>
+
+        <a href="#" id="download-button" class="download-button" onclick="downloadPDF()">Download as PDF</a>
+
+        <div class="footer">
+            <div class="logo-container">
+                <div class="logo" style="width: 0.5in; height: 0.5in;">
+                    <svg class="w-0.3in h-0.3in text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 12h2v5H7v-5zm4-6h2v11h-2V6zm4 3h2v8h-2V9z" />
+                    </svg>
+                </div>
+                <span class="company-name" style="font-size: 10pt;">AnalyticsHub</span>
+            </div>
+            <p>Generated by AnalyticsHub on {{ processed_at }}</p>
+        </div>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: [1, 1, 1, 1], // 1in margins
+                filename: 'report_{{ job_id }}.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, // Balanced resolution
+                    useCORS: true,
+                    windowWidth: 794 // A4 width in pixels (8.27in at 96 DPI)
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: { 
+                    mode: ['avoid-all', 'css'],
+                    before: ['h1'],
+                    avoid: ['table', 'img']
+                }
+            };
+            html2pdf().set(opt).from(element).save()
+                .catch(err => console.error('PDF generation error:', err));
+        }
+    </script>
+</body>
+</html>

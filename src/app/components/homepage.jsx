@@ -18,174 +18,240 @@ const HomePage = () => {
   const heroRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+    const handleScroll = throttle(() => {
+      setScrollY(window.scrollY);
+    }, 100); // Update every 100ms
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const particles = [];
-    const connections = [];
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
-        this.opacity = Math.random() * 0.6 + 0.2;
-        this.size = Math.random() * 2 + 1;
-        this.hue = Math.random() * 60 + 240;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-
-        const dx = mousePosition.x - this.x;
-        const dy = mousePosition.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 100) {
-          const force = (100 - distance) / 100;
-          this.vx += (dx / distance) * force * 0.01;
-          this.vy += (dy / distance) * force * 0.01;
-        }
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
-        gradient.addColorStop(0, `hsla(${this.hue}, 70%, 60%, ${this.opacity})`);
-        gradient.addColorStop(1, `hsla(${this.hue}, 70%, 60%, 0)`);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < 80; i++) {
-      particles.push(new Particle());
-    }
-
-    const animate = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((particle, i) => {
-        particle.update();
-        particle.draw();
-
-        particles.slice(i + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 120) {
-            const opacity = (120 - distance) / 120 * 0.1;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(147, 51, 234, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, [mousePosition]);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+<<<<<<< HEAD:src/app/components/homepage.jsx
+=======
+useEffect(() => {
+    const handleScroll = throttle(() => {
+      setScrollY(window.scrollY);
+    }, 100); 
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+  const throttle = (func, limit) => {
+    let lastFunc;
+    let lastRan;
+    return function (...args) {
+      if (!lastRan) {
+        func.apply(this, args);
+        lastRan = Date.now();
+      } else {
+        clearTimeout(lastFunc);
+        lastFunc = setTimeout(() => {
+          if (Date.now() - lastRan >= limit) {
+            func.apply(this, args);
+            lastRan = Date.now();
+          }
+        }, limit - (Date.now() - lastRan));
+      }
+    };
+  };
+
+  useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  let animationFrameId;
+
+  const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+<<<<<<< HEAD:src/app/components/homepage.jsx
+      this.vx = (Math.random() - 0.5) * 0.5; // Reduced speed
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.opacity = Math.random() * 0.4 + 0.2;
+      this.size = Math.random() * 1.5 + 1; // Smaller particles
+=======
+      this.vx = (Math.random() - 0.5) * 0.5; 
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.opacity = Math.random() * 0.4 + 0.2;
+      this.size = Math.random() * 1.5 + 1; 
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+      this.hue = Math.random() * 60 + 240;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+      const dx = mousePosition.x - this.x;
+      const dy = mousePosition.y - this.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+<<<<<<< HEAD:src/app/components/homepage.jsx
+      if (distance < 80) { // Reduced interaction distance
+        const force = (80 - distance) / 80;
+        this.vx += (dx / distance) * force * 0.005; // Reduced force
+=======
+      if (distance < 80) { 
+        const force = (80 - distance) / 80;
+        this.vx += (dx / distance) * force * 0.005; 
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+        this.vy += (dy / distance) * force * 0.005;
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+<<<<<<< HEAD:src/app/components/homepage.jsx
+      ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; // Simplified fill
+=======
+      ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; 
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+      ctx.fill();
+    }
+  }
+
+<<<<<<< HEAD:src/app/components/homepage.jsx
+  for (let i = 0; i < 40; i++) { // Reduced particle count
+=======
+  for (let i = 0; i < 40; i++) {
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+    particles.push(new Particle());
+  }
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        const animate = () => {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          particles.forEach((particle, i) => {
+            particle.update();
+            particle.draw();
+
+            particles.slice(i + 1).forEach(otherParticle => {
+              const dx = particle.x - otherParticle.x;
+              const dy = particle.y - otherParticle.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+<<<<<<< HEAD:src/app/components/homepage.jsx
+              if (distance < 100) { // Reduced connection distance
+=======
+              if (distance < 100) {
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c:src/app/components/homepage.js
+                const opacity = (100 - distance) / 100 * 0.08;
+                ctx.beginPath();
+                ctx.moveTo(particle.x, particle.y);
+                ctx.lineTo(otherParticle.x, otherParticle.y);
+                ctx.strokeStyle = `rgba(147, 51, 234, ${opacity})`;
+                ctx.lineWidth = 0.4;
+                ctx.stroke();
+              }
+            });
+          });
+
+          animationFrameId = requestAnimationFrame(animate);
+        };
+        animate();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    },
+    { threshold: 0.1 }
+  );
+
+  observer.observe(canvas);
+
+  return () => {
+    cancelAnimationFrame(animationFrameId);
+    window.removeEventListener('resize', resizeCanvas);
+    observer.disconnect();
+  };
+}, [mousePosition]);
+
+  useEffect(() => {
+  const handleMouseMove = throttle((e) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, 100);
+  window.addEventListener('mousemove', handleMouseMove);
+  return () => window.removeEventListener('mousemove', handleMouseMove);
+}, []);
   const processFile = async (file) => {
-  try {
-    setUploadedFile(file);
-    gainExperience(150);
-    setIsAnalyzing(true);
-    setAnalysisProgress(0);
+    try {
+      setUploadedFile(file);
+      gainExperience(150);
+      setIsAnalyzing(true);
+      setAnalysisProgress(0);
 
-    const jobId = await uploadFileToBackend(file);
-    await pollJobStatus(jobId); 
-  } catch (err) {
-    console.error('File processing error:', err);
-    setIsAnalyzing(false);
-    alert(`Upload failed: ${err.message}. Please try again.`);
-  }
-};
+      const jobId = await uploadFileToBackend(file);
+      await pollJobStatus(jobId);
+    } catch (err) {
+      console.error('File processing error:', err);
+      setIsAnalyzing(false);
+      alert(`Upload failed: ${err.message}. Please try again.`);
+    }
+  };
   const handleDrop = async (e) => {
-  e.preventDefault();
-  setDragActive(false);
-  const files = e.dataTransfer.files;
-  if (files[0]) {
-    await processFile(files[0]);
-  }
-};
+    e.preventDefault();
+    setDragActive(false);
+    const files = e.dataTransfer.files;
+    if (files[0]) {
+      await processFile(files[0]);
+    }
+  };
 
-const handleFileSelect = async (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    await processFile(file);
-  }
-};
+  const handleFileSelect = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      await processFile(file);
+    }
+  };
 
   const uploadFileToBackend = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
 
-  try {
-    console.log('Uploading file:', file.name);
-    
-    const res = await fetch('http://localhost:5000/run-analysis', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      console.log('Uploading file:', file.name);
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Upload failed: ${res.status} ${res.statusText} - ${errorText}`);
+      const res = await fetch('http://localhost:5000/run-analysis', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Upload failed: ${res.status} ${res.statusText} - ${errorText}`);
+      }
+
+      const data = await res.json();
+      console.log('Upload response:', data);
+
+      if (!data.job_id) {
+        throw new Error('No job ID returned from server');
+      }
+
+      return data.job_id;
+    } catch (err) {
+      console.error('Upload error:', err);
+      throw err;
     }
-
-    const data = await res.json();
-    console.log('Upload response:', data);
-    
-    if (!data.job_id) {
-      throw new Error('No job ID returned from server');
-    }
-    
-    return data.job_id;
-  } catch (err) {
-    console.error('Upload error:', err);
-    throw err;
-  }
-};
+  };
 
   const startAnalysis = () => {
     setIsAnalyzing(true);
@@ -202,90 +268,90 @@ const handleFileSelect = async (e) => {
       });
     }, 200);
   };
- 
-const pollJobStatus = async (jobId) => {
-  console.log(`Starting to poll job status for: ${jobId}`);
-  setIsAnalyzing(true);
-  setAnalysisProgress(0);
-  
-  let attempts = 0;
-  const maxAttempts = 150; 
-  
-  const poll = async () => {
-    try {
-      console.log(`Polling attempt ${attempts + 1}/${maxAttempts} for job ${jobId}`);
-      
-      const response = await fetch(`http://localhost:5000/job-status/${jobId}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Job not found. Please try uploading the file again.');
+
+  const pollJobStatus = async (jobId) => {
+    console.log(`Starting to poll job status for: ${jobId}`);
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+
+    let attempts = 0;
+    const maxAttempts = 150;
+
+    const poll = async () => {
+      try {
+        console.log(`Polling attempt ${attempts + 1}/${maxAttempts} for job ${jobId}`);
+
+        const response = await fetch(`http://localhost:5000/job-status/${jobId}`);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Job not found. Please try uploading the file again.');
+          }
+          throw new Error(`Server error: ${response.status}`);
         }
-        throw new Error(`Server error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log(`Job status:`, data);
 
-      const progress = Math.min(Math.max(data.progress || 0, 0), 100);
-      setAnalysisProgress(progress);
+        const data = await response.json();
+        console.log(`Job status:`, data);
 
-      if (data.status === 'completed') {
-        console.log('Job completed successfully');
-        setIsAnalyzing(false);
-        gainExperience(300);
-        
-        window.location.href = `/results?job_id=${jobId}`;
-        return;
-        
-      } else if (data.status === 'failed') {
-        console.error('Job failed:', data.error);
-        setIsAnalyzing(false);
- 
-        const errorMsg = data.error || 'Unknown error occurred during analysis';
-        alert(`Analysis failed: ${errorMsg}\n\nPlease try uploading your file again.`);
-        return;
-        
-      } else if (data.status === 'processing') {
-        console.log(`Job processing... Progress: ${progress}%`);
+        const progress = Math.min(Math.max(data.progress || 0, 0), 100);
+        setAnalysisProgress(progress);
 
-        
-      } else if (data.status === 'queued') {
-        console.log('Job queued, waiting to start...');
- 
-        
-      } else {
-        console.warn('Unknown status:', data.status);
-      
-      }
-      
+        if (data.status === 'completed') {
+          console.log('Job completed successfully');
+          setIsAnalyzing(false);
+          gainExperience(300);
 
-      attempts++;
-      if (attempts < maxAttempts) {
-        setTimeout(poll, 2000);
-      } else {
-        console.error('Polling timed out after', maxAttempts, 'attempts');
-        setIsAnalyzing(false);
-        alert('Analysis timed out. This might mean your file is very large or there was a server issue. Please try again with a smaller file or contact support.');
+          window.location.href = `/results?job_id=${jobId}`;
+          return;
+
+        } else if (data.status === 'failed') {
+          console.error('Job failed:', data.error);
+          setIsAnalyzing(false);
+
+          const errorMsg = data.error || 'Unknown error occurred during analysis';
+          alert(`Analysis failed: ${errorMsg}\n\nPlease try uploading your file again.`);
+          return;
+
+        } else if (data.status === 'processing') {
+          console.log(`Job processing... Progress: ${progress}%`);
+
+
+        } else if (data.status === 'queued') {
+          console.log('Job queued, waiting to start...');
+
+
+        } else {
+          console.warn('Unknown status:', data.status);
+
+        }
+
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 2000);
+        } else {
+          console.error('Polling timed out after', maxAttempts, 'attempts');
+          setIsAnalyzing(false);
+          alert('Analysis timed out. This might mean your file is very large or there was a server issue. Please try again with a smaller file or contact support.');
+        }
+
+      } catch (err) {
+        console.error('Polling error:', err);
+        attempts++;
+
+        if (attempts < maxAttempts) {
+          console.log(`Retrying in 3 seconds... (attempt ${attempts}/${maxAttempts})`);
+          setTimeout(poll, 3000);
+        } else {
+          setIsAnalyzing(false);
+          alert(`Error checking analysis status: ${err.message}\n\nPlease try uploading your file again.`);
+        }
       }
-      
-    } catch (err) {
-      console.error('Polling error:', err);
-      attempts++;
-      
-      if (attempts < maxAttempts) {
-        console.log(`Retrying in 3 seconds... (attempt ${attempts}/${maxAttempts})`);
-        setTimeout(poll, 3000);
-      } else {
-        setIsAnalyzing(false);
-        alert(`Error checking analysis status: ${err.message}\n\nPlease try uploading your file again.`);
-      }
-    }
+    };
+
+
+    poll();
   };
-  
-
-  poll();
-};
 
 
   const gainExperience = (exp) => {
@@ -330,7 +396,7 @@ const pollJobStatus = async (jobId) => {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <Navbar/>
+      <Navbar />
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" />
 
 

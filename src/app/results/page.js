@@ -1,30 +1,38 @@
+<<<<<<< HEAD
+'use client';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+=======
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "../components/navbar";
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
 export default function ResultsPage() {
-  const [summary, setSummary] = useState(null);
+  const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
   const searchParams = useSearchParams();
-  const jobId = searchParams.get("job_id");
+  const jobId = searchParams.get('job_id');
 
   useEffect(() => {
     if (!jobId) {
-      setError("No job ID provided");
+      setError('No job ID provided');
       setLoading(false);
       return;
     }
 
     fetch(`http://localhost:5000/results/${jobId}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch job results");
+        if (!res.ok) throw new Error(`Failed to fetch job results: ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        setSummary(data.summary);
+        setResults(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -42,35 +50,74 @@ export default function ResultsPage() {
   };
 
   const formatSummaryData = (data) => {
+<<<<<<< HEAD
     if (!data) return [];
-    
+
     const entries = [];
     Object.entries(data).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         Object.entries(value).forEach(([subKey, subValue]) => {
           entries.push({
             category: key,
             metric: subKey,
-            value: typeof subValue === 'number' ? 
-              (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4)) : 
-              subValue
+            value: (typeof subValue === 'object' && subValue !== null)
+              ? JSON.stringify(subValue)
+              : (typeof subValue === 'number'
+                ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
+                : subValue)
           });
         });
       } else {
         entries.push({
           category: 'General',
           metric: key,
-          value: typeof value === 'number' ? 
-            (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4)) : 
-            value
+          value: (typeof value === 'object' && value !== null)
+            ? JSON.stringify(value)
+            : (typeof value === 'number'
+              ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
+              : value)
         });
       }
     });
-    
+
     return entries;
   };
 
+  const summaryEntries = formatSummaryData(results?.summary);
+=======
+  if (!data) return [];
+
+  const entries = [];
+  Object.entries(data).forEach(([key, value]) => {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.entries(value).forEach(([subKey, subValue]) => {
+        entries.push({
+          category: key,
+          metric: subKey,
+          value: (typeof subValue === 'object' && subValue !== null)
+            ? JSON.stringify(subValue)
+            : (typeof subValue === 'number'
+                ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
+                : subValue)
+        });
+      });
+    } else {
+      entries.push({
+        category: 'General',
+        metric: key,
+        value: (typeof value === 'object' && value !== null)
+          ? JSON.stringify(value)
+          : (typeof value === 'number'
+              ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
+              : value)
+      });
+    }
+  });
+
+  return entries;
+};
   const summaryEntries = formatSummaryData(summary);
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
   const groupedEntries = summaryEntries.reduce((acc, entry) => {
     if (!acc[entry.category]) acc[entry.category] = [];
     acc[entry.category].push(entry);
@@ -79,14 +126,22 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white">
-
+<<<<<<< HEAD
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
+=======
+      <Navbar/>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
+<<<<<<< HEAD
       <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto">
+=======
+      <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto my-20">
 
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -99,7 +154,7 @@ export default function ResultsPage() {
             </div>
             <span className="text-purple-300 font-medium">Job ID: {jobId}</span>
           </div>
-          
+
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
             Analysis Results
           </h1>
@@ -129,10 +184,7 @@ export default function ResultsPage() {
           )}
         </AnimatePresence>
 
-
         <div className="grid lg:grid-cols-2 gap-8">
-          
-
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -156,8 +208,8 @@ export default function ResultsPage() {
                     </div>
                   </div>
                 )}
-                
-                {summary ? (
+
+                {results?.image_url ? (
                   <motion.img
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: imageLoading ? 0 : 1, scale: imageLoading ? 0.9 : 1 }}
@@ -197,13 +249,10 @@ export default function ResultsPage() {
               {loading ? (
                 <div className="space-y-4">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="h-4 bg-gray-700/50 rounded-lg mb-2" />
-                      <div className="h-3 bg-gray-600/50 rounded-lg w-3/4" />
-                    </div>
+                    <div key={i} className="text-gray-400">Loading...</div>
                   ))}
                 </div>
-              ) : summary ? (
+              ) : results?.summary ? (
                 <div className="space-y-6 max-h-96 overflow-y-auto custom-scrollbar">
                   {Object.entries(groupedEntries).map(([category, entries], categoryIndex) => (
                     <motion.div
@@ -223,13 +272,13 @@ export default function ResultsPage() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.3, delay: (categoryIndex * 0.1) + (index * 0.05) }}
-                            className="group bg-gray-700/30 hover:bg-gray-700/50 rounded-xl p-4 transition-all duration-300 border border-gray-600/30 hover:border-purple-500/30"
+                            className="group bg-gray-700/30 hover:bg-gray-300 rounded-xl p-4 transition-all duration-200 border border-gray-600/30 hover:border-purple-500/30"
                           >
                             <div className="flex justify-between items-center">
                               <span className="text-gray-300 font-medium group-hover:text-white transition-colors duration-300">
-                                {entry.metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                {entry.metric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                               </span>
-                              <span className="text-purple-300 font-semibold bg-purple-500/10 px-3 py-1 rounded-lg group-hover:bg-purple-500/20 transition-colors duration-300">
+                              <span className="text-purple-600 font-semibold bg-purple-200/10 px-4 py-2 rounded-lg group-hover:bg-purple-200/20 transition-colors duration-300">
                                 {entry.value}
                               </span>
                             </div>
@@ -249,14 +298,78 @@ export default function ResultsPage() {
               )}
             </div>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="space-y-6 lg:col-span-2"
+          >
+            <div className="bg-gray-800/40 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white text-xl">💡</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white">Key Insights</h2>
+              </div>
+
+              {loading ? (
+                <div className="space-y-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-4 bg-gray-700/50 rounded-lg mb-2" />
+                      <div className="h-3 bg-gray-600/50 rounded-lg w-3/4" />
+                    </div>
+                  ))}
+                </div>
+              ) : results?.insights ? (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-2">Summary</h3>
+                    <p className="text-gray-300">{results.insights.summary}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-2">Key Columns</h3>
+                    <ul className="list-disc pl-6 text-gray-300">
+                      {results.insights.key_columns.map((col, index) => (
+                        <li key={index}>{col}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-2">Correlation Insights</h3>
+                    <ul className="list-disc pl-6 text-gray-300">
+                      {results.insights.correlation_insights.map((insight, index) => (
+                        <li key={index}>{insight}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-2">Recommendations</h3>
+                    <ul className="list-disc pl-6 text-gray-300">
+                      {results.insights.recommendations.map((rec, index) => (
+                        <li key={index}>{rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ) : !error && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                    <p className="text-gray-400">Loading insights...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
 
-
-        {summary && (
+        {results?.summary && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
             className="mt-8"
           >
             <details className="bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-gray-700/50 overflow-hidden">
@@ -270,7 +383,7 @@ export default function ResultsPage() {
               </summary>
               <div className="px-6 pb-6">
                 <pre className="bg-gray-900/60 text-sm p-4 rounded-xl overflow-x-auto border border-gray-600/30 text-gray-300 leading-relaxed">
-{JSON.stringify(summary, null, 2)}
+                  {JSON.stringify(results.summary, null, 2)}
                 </pre>
               </div>
             </details>
@@ -280,7 +393,7 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
           className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
         >
           <button
@@ -311,6 +424,23 @@ export default function ResultsPage() {
               <span>Refresh Results</span>
             </span>
           </button>
+
+          {results && (
+  <button
+    onClick={() => window.open(`http://localhost:5000/report/${jobId}`, '_blank')}
+    className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
+  >
+    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 group-hover:from-green-500 group-hover:to-teal-500 transition-all duration-300" />
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300 scale-75 group-hover:scale-100" />
+    <span className="relative z-10 flex items-center space-x-2">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+      <span>Download Report</span>
+    </span>
+  </button>
+)}
         </motion.div>
       </div>
 
