@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/navbar";
+<<<<<<< HEAD
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+=======
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
 export default function ResultsPage() {
@@ -51,6 +54,7 @@ export default function ResultsPage() {
 
   const formatSummaryData = (data) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!data) return [];
 
     const entries = [];
@@ -87,6 +91,10 @@ export default function ResultsPage() {
 =======
   if (!data) return [];
 
+=======
+  if (!data) return [];
+
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
   const entries = [];
   Object.entries(data).forEach(([key, value]) => {
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
@@ -127,7 +135,12 @@ export default function ResultsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white">
 <<<<<<< HEAD
+<<<<<<< HEAD
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
+=======
+      <Navbar/>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 =======
       <Navbar/>
       <div className="fixed inset-0 overflow-hidden pointer-events-none my-20">
@@ -137,8 +150,11 @@ export default function ResultsPage() {
       </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
       <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto">
 =======
+=======
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
       <div className="relative z-10 p-4 sm:p-8 max-w-7xl mx-auto my-20">
 
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c

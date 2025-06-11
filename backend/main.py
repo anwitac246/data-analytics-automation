@@ -30,6 +30,9 @@ app.config['UPLOAD_FOLDER'] = "uploads"
 app.config['OUTPUT_FOLDER'] = "outputs"
 app.config['STATIC_FOLDER'] = "static"
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  
+<<<<<<< HEAD
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+=======
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -37,6 +40,10 @@ os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 =======
 
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
@@ -180,6 +187,9 @@ def run_analysis():
 <<<<<<< HEAD
 =======
         
+<<<<<<< HEAD
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+=======
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         original_filename = file.filename
         secure_name = secure_filename(file.filename)
@@ -532,6 +542,7 @@ def results(job_id):
             }), 400
         
 <<<<<<< HEAD
+<<<<<<< HEAD
         if job_data.get("type") == "ml-analysis":
             output_file = job_data.get("output_file")
             if not os.path.exists(output_file):
@@ -546,6 +557,8 @@ def results(job_id):
 
 =======
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+=======
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         summary_path = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_summary.json')
         image_path = os.path.join(app.config['STATIC_FOLDER'], f'{job_id}_histogram.png')
         insights_path = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_insights.json')
@@ -555,6 +568,9 @@ def results(job_id):
         print(f"Looking for summary at: {summary_path}")
         print(f"Looking for image at: {image_path}")
         
+<<<<<<< HEAD
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
+=======
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         if not os.path.exists(summary_path):
             return jsonify({"error": "Summary file not found"}), 404
@@ -564,8 +580,11 @@ def results(job_id):
             return jsonify({"error": "Insights file not found"}), 404
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         with open(summary_path, 'r', encoding='utf-8') as f:
 =======
+=======
+>>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         with open(summary_path, 'r') as f:
 >>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
             summary = json.load(f)
