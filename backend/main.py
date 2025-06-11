@@ -19,34 +19,16 @@ from ml_analysis import process_ml_analysis_async
 app = Flask(__name__)
 CORS(app)
 
-<<<<<<< HEAD
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'notebooks/Uploads'
 app.config['OUTPUT_FOLDER'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'outputs'))
 app.config['STATIC_FOLDER'] = 'static'
 app.config['TEMPLATE_FOLDER'] = 'templates'
-=======
-app.config['UPLOAD_FOLDER'] = "uploads"
-app.config['OUTPUT_FOLDER'] = "outputs"
-app.config['STATIC_FOLDER'] = "static"
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  
-<<<<<<< HEAD
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
-
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 jobs = {}
 jobs_lock = threading.Lock()
 
@@ -57,7 +39,6 @@ def update_job_status(job_id, **kwargs):
 
 def render_latex_to_html(job_id, template_data, output_dir):
     try:
-<<<<<<< HEAD
         tex_content = render_template('report_template.tex', **template_data)
         tex_file = os.path.join(output_dir, f'{job_id}_report.tex')
         with open(tex_file, 'w', encoding='utf-8') as f:
@@ -92,78 +73,6 @@ def render_latex_to_html(job_id, template_data, output_dir):
     except subprocess.CalledProcessError as e:
         print(f"Pandoc/LaTeX error: {e.stderr}")
         raise
-=======
-        print(f"Starting processing for job {job_id}")
-        
-    
-        update_job_status(job_id, status="processing", progress=10)
-        
-    
-        output_notebook = os.path.abspath(os.path.join(app.config['OUTPUT_FOLDER'], f"{job_id}_output.ipynb"))
-        output_image = os.path.abspath(os.path.join(app.config['STATIC_FOLDER'], f'{job_id}_histogram.png'))
-        summary_file = os.path.abspath(os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_summary.json'))
-        
-        print(f"Output paths:")
-        print(f"  - Notebook: {output_notebook}")
-        print(f"  - Image: {output_image}")
-        print(f"  - Summary: {summary_file}")
-    
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Input file not found: {filepath}")
-  
-        notebook_path = 'notebooks/preprocessing.ipynb'
-        if not os.path.exists(notebook_path):
-            raise FileNotFoundError(f"Notebook not found: {notebook_path}")
-
-        update_job_status(job_id, progress=30)
-        
-        print(f"Executing notebook for job {job_id}")
-        print(f"Input file size: {os.path.getsize(filepath)} bytes")
-
-        pm.execute_notebook(
-            notebook_path,
-            output_notebook,
-            parameters={
-                "input_file": os.path.abspath(filepath),
-                "output_image": output_image,
-                "summary_file": summary_file,
-                "job_id": job_id
-            }
-        )
-        
-        print(f"Notebook executed for job {job_id}")
-        
-
-        update_job_status(job_id, progress=80)
-        
-    
-        print(f"Checking output files:")
-        print(f"  - Summary file exists: {os.path.exists(summary_file)}")
-        print(f"  - Image file exists: {os.path.exists(output_image)}")
-        print(f"  - Output notebook exists: {os.path.exists(output_notebook)}")
-        
-        print(f"Files in {app.config['OUTPUT_FOLDER']}:")
-        for f in os.listdir(app.config['OUTPUT_FOLDER']):
-            print(f"  - {f}")
-            
-        print(f"Files in {app.config['STATIC_FOLDER']}:")
-        for f in os.listdir(app.config['STATIC_FOLDER']):
-            print(f"  - {f}")
-        
-        if os.path.exists(summary_file):
-            print(f"Job {job_id} completed successfully")
-            update_job_status(
-                job_id,
-                status="completed",
-                progress=100,
-                summary_file=summary_file,
-                image_file=output_image,
-                filename=filename
-            )
-        else:
-            raise FileNotFoundError("Summary file was not created by the notebook")
-            
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
     except Exception as e:
         print(f"Error rendering LaTeX to HTML: {str(e)}")
         raise
@@ -184,13 +93,6 @@ def run_analysis():
             return jsonify({"error": "Invalid file type. Allowed: CSV, Excel, JSON"}), 400
 
         job_id = str(uuid.uuid4())
-<<<<<<< HEAD
-=======
-        
-<<<<<<< HEAD
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         original_filename = file.filename
         secure_name = secure_filename(file.filename)
         filename = f"{job_id}_{secure_name}"
@@ -332,7 +234,7 @@ def generate_submission():
             print(f"Error: Test data ({len(test_df)} rows) and submission data ({len(submission_df)} rows) have mismatched row counts")
             return jsonify({"error": "Test and submission files must have the same number of rows"}), 400
 
-        # Drop 'id' column if present in test_df and train_df
+        # Drop 'id' column if present
         if 'id' in test_df.columns:
             test_df = test_df.drop(columns=['id'])
         if 'id' in train_df.columns:
@@ -359,16 +261,16 @@ def generate_submission():
         if extra_cols:
             print(f"Dropping extra columns: {extra_cols}")
             test_df = test_df.drop(columns=extra_cols)
-        test_df = test_df[schema['columns']]  # Reorder columns
+        test_df = test_df[schema['columns']] # Reorder columns
         print(f"Test_df columns after reordering: {test_df.columns.tolist()}")
 
         # Enforce dtypes
         for col, dtype in schema['dtypes'].items():
-            try:
-                test_df[col] = test_df[col].astype(dtype)
-            except Exception as e:
-                print(f"Error converting column {col} to {dtype}: {str(e)}")
-                return jsonify({"error": f"Cannot convert {col} to {dtype}: {str(e)}"}), 400
+                try:
+                    test_df[col] = test_df[col].astype(dtype)
+                except Exception as e:
+                    print(f"Error converting column {col} to {dtype}: {str(e)}")
+                    return jsonify({"error": f"Cannot convert {col} to {dtype}: {str(e)}"}), 400
         print(f"Test_df dtypes after conversion: {test_df.dtypes}")
 
         # Drop datetime columns if any
@@ -469,13 +371,68 @@ def process_file_async(job_id, filepath, filename):
         with open(summary_file, 'r') as f:
             summary_data = json.load(f)
         
-        # Dummy LLM insights for testing
-        llm_insights = {
-            "summary": "Dataset processed, insights skipped for testing.",
-            "key_columns": [],
-            "correlation_insights": [],
-            "recommendations": ["Enable Groq API for full insights."]
-        }
+        # Initialize Groq client
+        api_key = "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"
+        if not api_key:
+            print(f"Warning: GROQ_API_KEY not found for job {job_id}")
+            llm_insights = {
+                "summary": "Dataset processed, but no LLM insights due to missing API key.",
+                "key_columns": [],
+                "correlation_insights": [],
+                "recommendations": ["Configure Groq API key for insights."]
+            }
+        else:
+            try:
+                client = Groq(api_key=api_key)
+                prompt = f"""
+                Analyze the following dataset summary and provide insights in JSON format with the structure:
+                {{
+                    "summary": str,
+                    "key_columns": list,
+                    "correlation_insights": list,
+                    "recommendations": list
+                }}
+
+                Dataset Summary:
+                - Shape: {summary_data.get('cleaned_shape', [0, 0])}
+                - Numeric Columns: {summary_data.get('numeric_columns', [])}
+                - Categorical Columns: {summary_data.get('categorical_columns', [])}
+                - Missing Values: {summary_data.get('missing_values', {})}
+                - Descriptive Statistics: {summary_data.get('descriptive_statistics', {})}
+                - Correlations: {summary_data.get('correlations', {})}
+                - Feature Importance: {summary_data.get('feature_importance', {})}
+
+                Provide:
+                - A concise summary of the dataset.
+                - Key columns critical for analysis (e.g., high importance or strong correlations).
+                - Insights on significant correlations (e.g., strong positive/negative correlations).
+                - Recommendations for data preprocessing or modeling (e.g., handle missing values, encode categoricals).
+                """
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.5,
+                    max_tokens=1024,
+                    response_format={"type": "json_object"}
+                )
+                llm_insights = json.loads(response.choices[0].message.content)
+                # Validate response structure
+                if not all(key in llm_insights for key in ["summary", "key_columns", "correlation_insights", "recommendations"]):
+                    print(f"Warning: Incomplete LLM response for job {job_id}")
+                    llm_insights = {
+                        "summary": "Dataset processed, but incomplete LLM insights.",
+                        "key_columns": [],
+                        "correlation_insights": [],
+                        "recommendations": ["Check LLM response format."]
+                    }
+            except Exception as e:
+                print(f"Error calling Groq API for job {job_id}: {str(e)}")
+                llm_insights = {
+                    "summary": f"Dataset processed, but LLM insights failed: {str(e)}",
+                    "key_columns": [],
+                    "correlation_insights": [],
+                    "recommendations": ["Verify Groq API key and connectivity."]
+                }
 
         insights_file = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_insights.json')
         with open(insights_file, 'w') as f:
@@ -509,18 +466,7 @@ def job_status(job_id):
         with jobs_lock:
             if job_id not in jobs:
                 return jsonify({"error": "Job not found"}), 404
-<<<<<<< HEAD
         return jsonify(jobs[job_id])
-=======
-            
-            job_data = jobs[job_id].copy()
-        
- 
-        job_data.pop('filepath', None)
-        
-        return jsonify(job_data)
-        
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
     except Exception as e:
         print(f"Error retrieving job status for {job_id}: {str(e)}")
         print(f"Traceback: {traceback.format_exc()}")
@@ -541,8 +487,6 @@ def results(job_id):
                 "progress": job_data.get("progress", 0)
             }), 400
         
-<<<<<<< HEAD
-<<<<<<< HEAD
         if job_data.get("type") == "ml-analysis":
             output_file = job_data.get("output_file")
             if not os.path.exists(output_file):
@@ -555,23 +499,10 @@ def results(job_id):
                 "status": "completed"
             })
 
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         summary_path = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_summary.json')
         image_path = os.path.join(app.config['STATIC_FOLDER'], f'{job_id}_histogram.png')
         insights_path = os.path.join(app.config['OUTPUT_FOLDER'], f'{job_id}_insights.json')
         
-<<<<<<< HEAD
-=======
-        print(f"Looking for summary at: {summary_path}")
-        print(f"Looking for image at: {image_path}")
-        
-<<<<<<< HEAD
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
         if not os.path.exists(summary_path):
             return jsonify({"error": "Summary file not found"}), 404
         if not os.path.exists(image_path):
@@ -579,14 +510,7 @@ def results(job_id):
         if not os.path.exists(insights_path):
             return jsonify({"error": "Insights file not found"}), 404
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         with open(summary_path, 'r', encoding='utf-8') as f:
-=======
-=======
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
-        with open(summary_path, 'r') as f:
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
             summary = json.load(f)
         with open(insights_path, 'r', encoding='utf-8') as f:
             insights = json.load(f)
@@ -667,37 +591,37 @@ def generate_report(job_id):
                 {"column": col, "count": count}
                 for col, count in ensure_dict(summary.get('missing_values', {}), 'missing_values').items()
             ],
-            "stats_columns": list(ensure_dict(summary.get('descriptive_statistics', {})).keys()),
+            "stats_columns": list(ensure_dict(summary.get('descriptive_statistics', {}), 'descriptive_statistics').keys()),
             "stats_rows": [
                 {
                     "stat": stat,
                     "stat_values": ensure_list(
                         [
                             round(summary.get('descriptive_statistics', {}).get(col, {}).get(stat, 0), 3)
-                            for col in ensure_dict(summary.get('descriptive_statistics', {})).keys()
+                            for col in ensure_dict(summary.get('descriptive_statistics', {}), 'descriptive_statistics').keys()
                         ],
                         f"stats_rows[{stat}]"
                     )
                 }
                 for stat in ['mean', 'std', 'min', '25%', '50%', '75%', 'max']
             ],
-            "corr_columns": list(ensure_dict(summary.get('correlations', {})).keys()),
+            "corr_columns": list(ensure_dict(summary.get('correlations', {}), 'correlations').keys()),
             "corr_rows": [
                 {
                     "column": col1,
                     "corr_values": ensure_list(
                         [
                             round(summary.get('correlations', {}).get(col1, {}).get(col2, 0), 3)
-                            for col2 in ensure_dict(summary.get('correlations', {})).keys()
+                            for col2 in ensure_dict(summary.get('correlations', {}), 'correlations').keys()
                         ],
                         f"corr_rows[{col1}]"
                     )
                 }
-                for col1 in ensure_dict(summary.get('correlations', {})).keys()
+                for col1 in ensure_dict(summary.get('correlations', {}), 'correlations').keys()
             ],
             "feature_importance": [
                 {"column": col, "importance": round(imp, 3)}
-                for col, imp in ensure_dict(summary.get('feature_importance', {})).items()
+                for col, imp in ensure_dict(summary.get('feature_importance', {}), 'feature_importance').items()
             ]
         }
         
@@ -747,25 +671,10 @@ def serve_output(filename):
         output_dir = app.config['OUTPUT_FOLDER']
         file_path = os.path.normpath(os.path.join(output_dir, safe_filename))
 
-<<<<<<< HEAD
         print(f"Requested filename: {filename}")
         print(f"Secured filename: {safe_filename}")
         print(f"Output directory: {output_dir}")
         print(f"Constructed file path: {file_path}")
-=======
-@app.route('/jobs')
-def list_jobs():
-    """List all jobs (for debugging)"""
-    with jobs_lock:
-       
-        safe_jobs = {}
-        for job_id, job_data in jobs.items():
-            safe_job = job_data.copy()
-            safe_job.pop('filepath', None)
-            safe_jobs[job_id] = safe_job
-    
-    return jsonify(safe_jobs)
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
 
         if not file_path.startswith(os.path.abspath(output_dir)):
             print(f"Security error: Attempted to access file outside output directory: {file_path}")
@@ -805,15 +714,4 @@ def list_jobs():
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-=======
-    print("Starting Flask server...")
-    print(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
-    print(f"Output folder: {app.config['OUTPUT_FOLDER']}")
-    print(f"Static folder: {app.config['STATIC_FOLDER']}")
-    
-    if not os.path.exists('notebooks/preprocessing.ipynb'):
-        print("WARNING: notebooks/preprocessing.ipynb not found!")
-    
->>>>>>> 49926b03549b447a8bb11539b8fec0a1669c416c
     app.run(debug=True, host='0.0.0.0', port=5000)
