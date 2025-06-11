@@ -1,0 +1,129 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+\usepackage{parskip}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    \Huge
+    \textbf{Data Analysis Report} \\
+    \vspace{0.5cm}
+    \Large
+    Dataset: \textbf{<dataset_name>} \\
+    \vspace{0.3cm}
+    Job ID: \textbf{<job_id>} \\
+    \vspace{0.3cm}
+    Generated on: \textbf{<processed_at>} \\
+    \vspace{1.5cm}
+    \normalsize
+    Powered by AI-Driven Analysis \\
+    \vspace{0.5cm}
+    \includegraphics[width=0.3\textwidth]{<image_path>}
+\end{titlepage}
+
+\section{Executive Summary}
+<insights_summary>
+
+\section{Dataset Overview}
+\begin{itemize}
+    \item \textbf{Rows}: <rows>
+    \item \textbf{Columns}: <columns>
+    \item \textbf{Numeric Columns}: <numeric_columns>
+    \item \textbf{Categorical Columns}: <categorical_columns>
+\end{itemize}
+
+\subsection{Missing Values}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Column} & \textbf{Missing Count} \\
+        \midrule
+        <missing_values_table>
+        \bottomrule
+    \end{tabular}
+    \caption{Missing Values per Column}
+\end{table}
+
+\section{Key Insights}
+\begin{itemize}
+    \item \textbf{Key Columns}: <key_columns>
+    \item \textbf{Correlation Insights}: 
+    \begin{itemize}
+        <correlation_insights>
+    \end{itemize}
+\end{itemize}
+
+\section{Statistical Analysis}
+\subsection{Descriptive Statistics}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l<stats_columns>}
+        \toprule
+        \textbf{Statistic} <stats_headers> \\
+        \midrule
+        <stats_rows>
+        \bottomrule
+    \end{tabular}
+    \caption{Descriptive Statistics for Numeric Columns}
+\end{table}
+
+\subsection{Feature Importance}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Column} & \textbf{Importance} \\
+        \midrule
+        <feature_importance_table>
+        \bottomrule
+    \end{tabular}
+    \caption{Feature Importance Scores}
+\end{table}
+
+\subsection{Correlation Matrix}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l<corr_columns>}
+        \toprule
+        \textbf{Column} <corr_headers> \\
+        \midrule
+        <corr_rows>
+        \bottomrule
+    \end{tabular}
+    \caption{Pearson Correlation Matrix}
+\end{table}
+
+\section{Visualization}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{<image_path>}
+    \caption{Data Analysis Visualization}
+\end{figure}
+
+\section{Recommendations}
+\begin{itemize}
+    <recommendations>
+\end{itemize}
+
+\section{Conclusion}
+This report provides a comprehensive analysis of the dataset, highlighting key columns, significant correlations, and actionable recommendations. By focusing on the identified columns and implementing the suggested actions, stakeholders can make informed decisions to drive business value.
+
+\end{document}
