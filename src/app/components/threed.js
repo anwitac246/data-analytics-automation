@@ -29,24 +29,26 @@ export default function OrbitingCubeGame() {
   const [showLevelComplete, setShowLevelComplete] = useState(false);
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    const mount = mountRef.current;
+    if (!mount) return;
+    
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
 
     const camera = new THREE.PerspectiveCamera(
       75,
-      mountRef.current.clientWidth / mountRef.current.clientHeight,
+      mount.clientWidth / mount.clientHeight,
       0.1,
       1000
     );
     camera.position.set(0, 0, 8);
     
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
+    mount.appendChild(renderer.domElement);
 
 
     gameStateRef.current.scene = scene;
@@ -292,11 +294,12 @@ export default function OrbitingCubeGame() {
     renderer.domElement.addEventListener('click', handleClick);
 
     const handleResize = () => {
-      if (!mountRef.current) return;
-      
-      const width = mountRef.current.clientWidth;
-      const height = mountRef.current.clientHeight;
-      
+      const mount = mountRef.current;
+      if (!mount) return;
+
+      const width = mount.clientWidth;
+      const height = mount.clientHeight;
+
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);

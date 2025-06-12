@@ -153,7 +153,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto text-center mb-20">
           <div className="inline-block mb-8">
             <h1 className="text-7xl md:text-8xl font-black bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent animate-pulse">
-              Let's Connect
+              Let&rsquo;s Connect
             </h1>
             <div className="h-1 w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent mt-4 animate-pulse"></div>
           </div>

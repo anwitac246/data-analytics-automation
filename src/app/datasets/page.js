@@ -169,7 +169,7 @@ export default function KaggleDatasetSearch() {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto font-light leading-relaxed">
-              Discover, preview, and download datasets from Kaggle's vast universe of data science resources with cutting-edge AI insights
+              Discover, preview, and download datasets from Kaggle&rsquo;s vast universe of data science resources with cutting-edge AI insights
             </p>
           </div>
         </div>
@@ -454,7 +454,7 @@ export default function KaggleDatasetSearch() {
             </div>
             <h3 className="text-3xl font-bold text-white mb-6">Ready to Explore?</h3>
             <p className="text-white/70 max-w-2xl mx-auto text-xl leading-relaxed">
-              Enter keywords above to discover datasets from Kaggle's vast collection of data science resources. 
+              Enter keywords above to discover datasets from Kaggle&rsquo;s vast collection of data science resources. 
               Unleash the power of data with AI-driven insights.
             </p>
           </div>

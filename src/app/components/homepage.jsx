@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Zap, TrendingUp, BarChart3, PieChart, LineChart, Sparkles, CheckCircle, Star, ArrowRight, Play, Target, Award, Trophy, Gift, Database, Brain, Rocket, Shield } from 'lucide-react';
 import OrbitingCubeGame from './threed';
 import Navbar from './navbar';
+import Link from 'next/link';
 
 const HomePage = () => {
   const [dragActive, setDragActive] = useState(false);
@@ -20,7 +21,7 @@ const HomePage = () => {
   useEffect(() => {
     const handleScroll = throttle(() => {
       setScrollY(window.scrollY);
-    }, 100); // Update every 100ms
+    }, 100); 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -530,7 +531,7 @@ useEffect(() => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <button className="group relative bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-10 rounded-2xl text-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
               <span className="relative z-10 flex items-center gap-3">
-                Start Free Analysis
+                <Link href="/ml-analysis">Start Free Analysis</Link>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

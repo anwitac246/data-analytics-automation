@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/navbar";
 
-export default function ResultsPage() {
+function ResultsContent() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,37 +43,38 @@ export default function ResultsPage() {
   };
 
   const formatSummaryData = (data) => {
-  if (!data) return [];
+    if (!data) return [];
 
-  const entries = [];
-  Object.entries(data).forEach(([key, value]) => {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      Object.entries(value).forEach(([subKey, subValue]) => {
-        entries.push({
-          category: key,
-          metric: subKey,
-          value: (typeof subValue === 'object' && subValue !== null)
-            ? JSON.stringify(subValue)
-            : (typeof subValue === 'number'
-                ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
-                : subValue)
+    const entries = [];
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          entries.push({
+            category: key,
+            metric: subKey,
+            value: (typeof subValue === 'object' && subValue !== null)
+              ? JSON.stringify(subValue)
+              : (typeof subValue === 'number'
+                  ? (Number.isInteger(subValue) ? subValue.toLocaleString() : subValue.toFixed(4))
+                  : subValue)
+          });
         });
-      });
-    } else {
-      entries.push({
-        category: 'General',
-        metric: key,
-        value: (typeof value === 'object' && value !== null)
-          ? JSON.stringify(value)
-          : (typeof value === 'number'
-              ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
-              : value)
-      });
-    }
-  });
+      } else {
+        entries.push({
+          category: 'General',
+          metric: key,
+          value: (typeof value === 'object' && value !== null)
+            ? JSON.stringify(value)
+            : (typeof value === 'number'
+                ? (Number.isInteger(value) ? value.toLocaleString() : value.toFixed(4))
+                : value)
+        });
+      }
+    });
 
-  return entries;
-};
+    return entries;
+  };
+
   const summaryEntries = formatSummaryData(results?.summary);
   const groupedEntries = summaryEntries.reduce((acc, entry) => {
     if (!acc[entry.category]) acc[entry.category] = [];
@@ -375,21 +376,21 @@ export default function ResultsPage() {
           </button>
 
           {results && (
-  <button
-    onClick={() => window.open(`http://localhost:5000/report/${jobId}`, '_blank')}
-    className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 group-hover:from-green-500 group-hover:to-teal-500 transition-all duration-300" />
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300 scale-75 group-hover:scale-100" />
-    <span className="relative z-10 flex items-center space-x-2">
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-      </svg>
-      <span>Download Report</span>
-    </span>
-  </button>
-)}
+            <button
+              onClick={() => window.open(`http://localhost:5000/report/${jobId}`, '_blank')}
+              className="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 group-hover:from-green-500 group-hover:to-teal-500 transition-all duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300 scale-75 group-hover:scale-100" />
+              <span className="relative z-10 flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span>Download Report</span>
+              </span>
+            </button>
+          )}
         </motion.div>
       </div>
 
@@ -410,5 +411,25 @@ export default function ResultsPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+// Loading fallback component
+function ResultsLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white flex items-center justify-center">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <p className="text-gray-400">Loading results...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<ResultsLoading />}>
+      <ResultsContent />
+    </Suspense>
   );
 }

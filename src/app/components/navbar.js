@@ -29,8 +29,6 @@ const Navbar = () => {
       ],
     },
     { href: 'datasets', label: 'Datasets' },
-    { href: '#pricing', label: 'Pricing' },
-    { href: 'about', label: 'About' },
     { href: 'contact', label: 'Contact' },
   ];
 
@@ -133,7 +131,7 @@ const Navbar = () => {
               className="ml-8"
             >
               <Link
-                href="#upload"
+                href="/ml-analysis"
                 className="group relative inline-flex items-center px-6 py-3 overflow-hidden text-white font-semibold rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:from-purple-500 group-hover:to-blue-500 transition-all duration-300" />
