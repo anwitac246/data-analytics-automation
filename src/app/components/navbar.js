@@ -28,10 +28,10 @@ const Navbar = () => {
         { href: '/ml-analysis', label: 'Machine Learning Analysis' },
       ],
     },
-    { href: '#examples', label: 'Examples' },
+    { href: 'datasets', label: 'Datasets' },
     { href: '#pricing', label: 'Pricing' },
-    { href: '#about', label: 'About' },
-    { href: '#contact', label: 'Contact' },
+    { href: 'about', label: 'About' },
+    { href: 'contact', label: 'Contact' },
   ];
 
   return (
