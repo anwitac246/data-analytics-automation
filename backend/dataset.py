@@ -6,6 +6,7 @@ import zipfile
 import tempfile
 import shutil
 import pandas as pd
+import numpy as np
 from datetime import datetime
 import logging
 from werkzeug.exceptions import BadRequest
@@ -202,6 +203,33 @@ class KaggleDatasetManager:
                 'error': str(e)
             }
 
+    def _clean_dataframe_for_json(self, df):
+        """Clean DataFrame to make it JSON serializable"""
+       
+        df_clean = df.copy()
+        
+       
+        df_clean = df_clean.replace([np.nan, np.inf, -np.inf], None)
+       
+        for col in df_clean.columns:
+            if df_clean[col].dtype == 'object':
+               
+                df_clean[col] = df_clean[col].astype(str).replace('nan', None).replace('None', None)
+            elif pd.api.types.is_integer_dtype(df_clean[col]):
+               
+                df_clean[col] = df_clean[col].astype('Int64') 
+            elif pd.api.types.is_float_dtype(df_clean[col]):
+               
+                pass
+            elif pd.api.types.is_bool_dtype(df_clean[col]):
+              
+                df_clean[col] = df_clean[col].astype('boolean')
+            elif pd.api.types.is_datetime64_any_dtype(df_clean[col]):
+          
+                df_clean[col] = df_clean[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+        
+        return df_clean
+
     def preview_dataset(self, dataset_ref, file_name=None, rows=10):
         """Preview dataset files"""
         temp_dir = None
@@ -255,6 +283,8 @@ class KaggleDatasetManager:
                             if df is None:
                                 raise Exception("Unable to decode file with available encodings")
 
+                            # Clean the DataFrame for JSON serialization
+                            df_clean = self._clean_dataframe_for_json(df)
                            
                             dtypes_dict = {}
                             for col, dtype in df.dtypes.items():
@@ -264,7 +294,7 @@ class KaggleDatasetManager:
                                 'file_name': file,
                                 'file_path': os.path.relpath(file_path, download_path),
                                 'columns': df.columns.tolist(),
-                                'data': df.to_dict('records'),
+                                'data': df_clean.to_dict('records'),
                                 'shape': list(df.shape),
                                 'dtypes': dtypes_dict,
                                 'file_size': os.path.getsize(file_path)
