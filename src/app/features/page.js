@@ -144,22 +144,22 @@ const FeaturesPage = () => {
           </p>
         </div>
 
-        <div className={`max-w-4xl mx-auto mb-20 transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
-            <div className="relative bg-gray-900 rounded-2xl p-2">
-              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl aspect-video flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500">
-                <div className="text-center">
-                  <div className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-full p-6 inline-flex items-center justify-center mb-4 cursor-pointer transition-all duration-300 hover:scale-110">
-                    <Play className="w-8 h-8 text-blue-400 ml-1" />
-                  </div>
-                  <p className="text-gray-300 text-lg">Watch Demo Video</p>
-                  <p className="text-gray-500 text-sm mt-2">https://demo-video-url.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+       <div className="relative group max-w-2xl mx-auto mb-20">
+  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+  <div className="relative bg-gray-900 rounded-2xl p-1">
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
+      <video
+        src="/demo.mp4"
+        className="w-full h-auto rounded-xl"
+        controls
+        preload="metadata"
+        style={{ maxHeight: '500px' }}
+      >
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+</div>
 
 
         <div className="max-w-6xl mx-auto relative">

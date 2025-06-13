@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Download, Eye, FileText, Calendar, Users, Tag, ChevronRight, Loader2, AlertCircle, CheckCircle2, Sparkles, Database, TrendingUp } from 'lucide-react';
 import Navbar from '../components/navbar';
 
@@ -13,9 +13,15 @@ export default function KaggleDatasetSearch() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [selectedDataset, setSelectedDataset] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  
+ 
+  const [previewData, setPreviewData] = useState({});
+  const [previewLoading, setPreviewLoading] = useState({});
+  const [previewErrors, setPreviewErrors] = useState({});
   const [searchStarted, setSearchStarted] = useState(false);
+  
+
+  const [activeRequests, setActiveRequests] = useState(new Set());
 
   const formatFileSize = (bytes) => {
     if (!bytes) return 'Unknown size';
@@ -51,11 +57,17 @@ export default function KaggleDatasetSearch() {
       if (data.success) {
         setDatasets(data.datasets);
         setSuccess(`Found ${data.datasets.length} datasets`);
+
+        setPreviewData({});
+        setPreviewLoading({});
+        setPreviewErrors({});
+        setActiveRequests(new Set());
       } else {
         setError(data.error || 'Failed to search datasets');
       }
     } catch (err) {
       setError('Failed to connect to the server. Make sure the backend is running.');
+      console.error('Search error:', err);
     } finally {
       setLoading(false);
     }
@@ -85,29 +97,93 @@ export default function KaggleDatasetSearch() {
       }
     } catch (err) {
       setError('Failed to download dataset');
+      console.error('Download error:', err);
     }
   };
 
-  const previewDataset = async (datasetRef) => {
-    setPreviewLoading(true);
-    setPreviewData(null);
-    setError('');
+  
+  const previewDataset = useCallback(async (datasetRef) => {
+
+    if (activeRequests.has(datasetRef)) {
+      console.log(`Preview already in progress for ${datasetRef}`);
+      return;
+    }
+
+
+    setActiveRequests(prev => new Set(prev).add(datasetRef));
+    
+    
+    setPreviewLoading(prev => ({ ...prev, [datasetRef]: true }));
+    
+
+    setPreviewData(prev => {
+      const newData = { ...prev };
+      delete newData[datasetRef];
+      return newData;
+    });
+    
+    setPreviewErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[datasetRef];
+      return newErrors;
+    });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/dataset/${datasetRef}/preview?rows=5`);
-      const data = await response.json();
+      console.log(`Starting preview for ${datasetRef}`);
+      
+      const response = await fetch(`${API_BASE_URL}/dataset/${datasetRef}/preview?rows=5`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (data.success) {
-        setPreviewData(data.previews);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log(`Preview response for ${datasetRef}:`, data);
+
+      if (data.success && data.previews) {
+        setPreviewData(prev => ({ 
+          ...prev, 
+          [datasetRef]: data.previews 
+        }));
+        console.log(`Preview loaded successfully for ${datasetRef}`);
       } else {
-        setError(data.error || 'Failed to preview dataset');
+        const errorMsg = data.error || 'Failed to preview dataset - no data returned';
+        setPreviewErrors(prev => ({ 
+          ...prev, 
+          [datasetRef]: errorMsg 
+        }));
+        console.error(`Preview error for ${datasetRef}:`, errorMsg);
       }
     } catch (err) {
-      setError('Failed to preview dataset');
+      const errorMsg = `Failed to preview dataset: ${err.message}`;
+      setPreviewErrors(prev => ({ 
+        ...prev, 
+        [datasetRef]: errorMsg 
+      }));
+      console.error(`Preview error for ${datasetRef}:`, err);
     } finally {
-      setPreviewLoading(false);
+     
+      setPreviewLoading(prev => ({ 
+        ...prev, 
+        [datasetRef]: false 
+      }));
+      
+      setActiveRequests(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(datasetRef);
+        return newSet;
+      });
+      
+      console.log(`Preview request completed for ${datasetRef}`);
     }
-  };
+  }, [activeRequests]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -115,7 +191,21 @@ export default function KaggleDatasetSearch() {
     }
   };
 
-  // Floating particles animation
+ 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const FloatingParticles = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {[...Array(6)].map((_, i) => (
@@ -133,9 +223,12 @@ export default function KaggleDatasetSearch() {
     </div>
   );
 
+  const isPreviewLoading = (datasetRef) => previewLoading[datasetRef] === true;
+  const hasPreviewData = (datasetRef) => previewData[datasetRef] && previewData[datasetRef].length > 0;
+  const hasPreviewError = (datasetRef) => previewErrors[datasetRef];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-blue-500/10 to-purple-500/10 animate-pulse" />
         <div className="absolute top-0 left-0 w-full h-full">
@@ -148,7 +241,7 @@ export default function KaggleDatasetSearch() {
 
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
         <Navbar/>
-        {/* Header */}
+
         <div className="text-center mb-16 relative mt-20">
           <div className="absolute inset-0 flex items-center justify-center opacity-10">
             <Database className="w-96 h-96 text-white" />
@@ -174,7 +267,6 @@ export default function KaggleDatasetSearch() {
           </div>
         </div>
 
-        {/* Search Section */}
         <div className="mb-12 relative">
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:shadow-pink-500/20 transition-all duration-500">
             <div className="flex flex-col lg:flex-row gap-6">
@@ -214,7 +306,6 @@ export default function KaggleDatasetSearch() {
           </div>
         </div>
 
-        {/* Status Messages */}
         {error && (
           <div className="mb-8 relative">
             <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-2xl p-6 flex items-center gap-4 shadow-xl">
@@ -233,7 +324,6 @@ export default function KaggleDatasetSearch() {
           </div>
         )}
 
-        {/* Results */}
         {datasets.length > 0 && (
           <div className="space-y-8">
             <div className="flex items-center gap-4 mb-8">
@@ -248,14 +338,12 @@ export default function KaggleDatasetSearch() {
                 className="group relative"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
                 
                 <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden shadow-2xl hover:shadow-pink-500/20 transition-all duration-500 hover:border-pink-400/40">
                   <div className="p-8">
                     <div className="flex flex-col xl:flex-row xl:items-start gap-8">
                       <div className="flex-1 space-y-6">
-                        {/* Title and subtitle */}
                         <div>
                           <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-pink-200 transition-colors duration-300">
                             {dataset.title}
@@ -272,7 +360,6 @@ export default function KaggleDatasetSearch() {
                           {dataset.description || 'No description available'}
                         </p>
 
-                        {/* Stats Grid */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
                             <div className="flex items-center gap-3 text-white/60">
@@ -315,7 +402,6 @@ export default function KaggleDatasetSearch() {
                           </div>
                         </div>
 
-                        {/* Tags */}
                         {dataset.tags && dataset.tags.length > 0 && (
                           <div className="flex flex-wrap gap-3">
                             {dataset.tags.slice(0, 5).map((tag, tagIndex) => (
@@ -335,14 +421,23 @@ export default function KaggleDatasetSearch() {
                         )}
                       </div>
 
-                      {/* Actions */}
                       <div className="flex flex-col gap-4 xl:w-64 xl:flex-shrink-0">
                         <button
                           onClick={() => previewDataset(dataset.ref)}
-                          className="px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 hover:scale-105 hover:shadow-lg"
+                          disabled={isPreviewLoading(dataset.ref)}
+                          className="px-6 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
-                          <Eye className="w-5 h-5" />
-                          Preview
+                          {isPreviewLoading(dataset.ref) ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Previewing...
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-5 h-5" />
+                              Preview
+                            </>
+                          )}
                         </button>
                         
                         <button
@@ -365,15 +460,24 @@ export default function KaggleDatasetSearch() {
                       </div>
                     </div>
 
-                    {/* Preview Data */}
-                    {previewData && previewData.length > 0 && (
+                    {hasPreviewError(dataset.ref) && (
+                      <div className="mt-8 pt-8 border-t border-white/20">
+                        <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-2xl p-6 flex items-center gap-4">
+                          <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0" />
+                          <p className="text-red-200">{previewErrors[dataset.ref]}</p>
+                        </div>
+                      </div>
+                    )}
+
+                
+                    {hasPreviewData(dataset.ref) && (
                       <div className="mt-8 pt-8 border-t border-white/20">
                         <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
                           <Sparkles className="w-6 h-6 text-pink-400" />
                           Data Preview
                         </h4>
                         
-                        {previewData.map((preview, previewIndex) => (
+                        {previewData[dataset.ref].map((preview, previewIndex) => (
                           <div key={previewIndex} className="mb-8">
                             <h5 className="font-semibold text-pink-200 mb-4 text-lg">
                               {preview.file_name}
@@ -420,7 +524,8 @@ export default function KaggleDatasetSearch() {
                       </div>
                     )}
 
-                    {previewLoading && (
+                
+                    {isPreviewLoading(dataset.ref) && (
                       <div className="mt-8 pt-8 border-t border-white/20 flex items-center justify-center py-12">
                         <Loader2 className="w-8 h-8 animate-spin text-pink-400 mr-3" />
                         <span className="text-white/80 text-lg">Loading preview...</span>
@@ -433,7 +538,6 @@ export default function KaggleDatasetSearch() {
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && datasets.length === 0 && !error && searchStarted && (
           <div className="text-center py-24">
             <div className="w-32 h-32 bg-gradient-to-br from-pink-500/20 to-blue-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-8 border border-white/20">
@@ -446,7 +550,6 @@ export default function KaggleDatasetSearch() {
           </div>
         )}
 
-        {/* Initial Empty State */}
         {!loading && datasets.length === 0 && !error && !searchStarted && (
           <div className="text-center py-24">
             <div className="w-32 h-32 bg-gradient-to-br from-pink-500/20 to-blue-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-8 border border-white/20 animate-pulse">

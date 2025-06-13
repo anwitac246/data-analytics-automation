@@ -537,13 +537,15 @@ useEffect(() => {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
 
-            <button className="group relative border-2 border-purple-500/50 text-purple-400 hover:text-white font-bold py-4 px-10 rounded-2xl text-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
-              <span className="relative z-10 flex items-center gap-3">
-                Watch Demo
-                <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
+            <Link href="/features">
+              <button className="group relative border-2 border-purple-500/50 text-purple-400 hover:text-white font-bold py-4 px-10 rounded-2xl text-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+                <span className="relative z-10 flex items-center gap-3">
+                  Watch Demo
+                  <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </button>
+            </Link>
           </div>
 
           <p className="text-gray-500 mt-8 text-sm">
