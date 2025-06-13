@@ -19,7 +19,7 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { href: '#features', label: 'Features' },
+    { href: 'features', label: 'Features' },
     {
       href: '#tools',
       label: 'Tools',
